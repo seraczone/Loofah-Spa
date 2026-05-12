@@ -1,7 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import { nitro } from "nitro/vite";
 import { defineConfig, loadEnv } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
@@ -22,30 +21,30 @@ export default defineConfig(({ mode }) => {
 
   return {
     define: envDefine,
+    plugins: [
+      tanstackRouter({
+        target: "react",
+        autoCodeSplitting: true,
+      }),
+      viteReact(),
+      tailwindcss(),
+      tsConfigPaths({ projects: ["./tsconfig.json"] }),
+    ],
     resolve: {
       alias: {
         "@": `${process.cwd()}/src`,
       },
       dedupe: REACT_DEDUPE,
     },
-    plugins: [
-      tailwindcss(),
-      tsConfigPaths({ projects: ["./tsconfig.json"] }),
-      tanstackStart({
-        importProtection: {
-          behavior: "error",
-          client: {
-            files: ["**/server/**"],
-            specifiers: ["server-only"],
-          },
-        },
-      }),
-      nitro(),
-      viteReact(),
-    ],
     server: {
       host: "::",
       port: 8080,
+      strictPort: true,
+    },
+    preview: {
+      host: "::",
+      port: 8080,
+      strictPort: true,
     },
   };
 });

@@ -1,12 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  HeadContent,
-  Link,
-  Outlet,
-  Scripts,
-  createRootRouteWithContext,
-  useRouter,
-} from "@tanstack/react-router";
+import { HeadContent, Link, Outlet, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
 import { EntryIntakeGate } from "@/components/EntryIntakeGate";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -15,8 +8,6 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE } from "@/lib/site";
-
-import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
@@ -74,88 +65,43 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: `${SITE.name} — ${SITE.tagline}` },
+      { title: `${SITE.name} - ${SITE.tagline}` },
       { name: "description", content: SITE.description },
       { name: "author", content: SITE.name },
       { name: "theme-color", content: "#FAF7F2" },
-      { property: "og:title", content: `${SITE.name} — ${SITE.tagline}` },
+      { property: "og:title", content: `${SITE.name} - ${SITE.tagline}` },
       { property: "og:description", content: SITE.description },
       { property: "og:type", content: "website" },
       { property: "og:image", content: SITE.ogImage },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: SITE.ogImage },
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
-      },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": ["LocalBusiness", "MedicalSpa"],
-          name: SITE.name,
-          image: SITE.ogImage,
-          url: SITE.url,
-          telephone: SITE.phone,
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: SITE.address.street,
-            addressLocality: SITE.address.city,
-            addressRegion: SITE.address.region,
-            addressCountry: SITE.address.country,
-          },
-          openingHours: ["Mo-Sa 09:00-20:00", "Su 11:00-18:00"],
-          priceRange: "₦₦₦",
-        }),
-      },
-    ],
   }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <EntryIntakeGate />
-          <Header />
-          <main className="min-h-screen">
-            <Outlet />
-          </main>
-          <Footer />
-          <MobileBar />
-          <Toaster richColors position="top-right" />
-        </CartProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <>
+      <HeadContent />
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <CartProvider>
+            <EntryIntakeGate />
+            <Header />
+            <main className="min-h-screen">
+              <Outlet />
+            </main>
+            <Footer />
+            <MobileBar />
+            <Toaster richColors position="top-right" />
+          </CartProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </>
   );
 }
