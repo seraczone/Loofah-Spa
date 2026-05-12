@@ -15,7 +15,7 @@ export const SITE = {
     { day: "Mon - Sat", time: "9:00 AM - 8:00 PM" },
     { day: "Sunday", time: "11:00 AM - 6:00 PM" },
   ],
-  phone: "+2349111111143",
+  phone: "+234 911 111 1143",
   whatsapp: "+2349111111143",
   email: "Loofahspang@gmail.com",
   map: {
