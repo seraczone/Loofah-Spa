@@ -16,8 +16,8 @@ export const SITE = {
     { day: "Sunday", time: "11:00 AM - 6:00 PM" },
   ],
   phone: "+234 800 000 0000",
-  whatsapp: "2348000000000",
-  email: "hello@loofahspa.ng",
+  whatsapp: "2349111111143",
+  email: "Loofahspang@gmail.com",
   map: {
     searchUrl:
       "https://www.google.com/maps/search/?api=1&query=20A%20Mombasa%20Street%2C%20Zone%205%2C%20Wuse%2C%20Abuja%2C%20FCT%2C%20Nigeria",
@@ -25,8 +25,8 @@ export const SITE = {
       "https://maps.google.com/maps?q=20A%20Mombasa%20Street%2C%20Zone%205%2C%20Wuse%2C%20Abuja%2C%20FCT%2C%20Nigeria&t=&z=15&ie=UTF8&iwloc=&output=embed",
   },
   social: {
-    instagram: "https://instagram.com/loofahspaabuja",
-    facebook: "https://facebook.com/loofahspaabuja",
+    instagram: "https://instagram.com/loofahlaserandaesthetics",
+    facebook: "https://facebook.com/loofahspa",
     tiktok: "https://tiktok.com/@loofahspaabuja",
   },
   url: "https://loofahspa.ng",
