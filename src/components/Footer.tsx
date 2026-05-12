@@ -130,7 +130,7 @@ export function Footer() {
             <Link to="/contact" className="hover:text-gold">
               Terms of Service
             </Link>
-            <span>Made in Nigeria</span>
+            <span>Designed by Seraczone Technology Ltd.</span>
           </div>
         </div>
       </div>
