@@ -81,12 +81,12 @@ function ContactPage() {
 
   return (
     <>
-      <section className="bg-ink text-ivory pt-40 pb-20 px-6 lg:px-12 text-center">
+      <section className="bg-ink px-6 pb-16 pt-32 text-center text-ivory lg:px-12 lg:pb-20 lg:pt-36">
         <span className="font-accent text-[11px] tracking-[0.3em] uppercase text-gold">Contact</span>
         <h1 className="mt-4 font-display italic text-hero">We'd love to hear from you.</h1>
       </section>
 
-      <section className="bg-ivory py-24 px-6 lg:px-12">
+      <section className="bg-ivory px-6 py-20 lg:px-12 lg:py-24">
         <div className="max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-16">
           <Reveal>
             <h2 className="font-display italic text-display text-ink">Send a message.</h2>

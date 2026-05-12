@@ -1,23 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2, LogIn, Shield } from "lucide-react";
-import { z } from "zod";
 import { toast } from "sonner";
 import { LuxButton, LuxLink } from "@/components/LuxButton";
 import { useAuth } from "@/components/providers/AuthProvider";
 
-const searchSchema = z.object({
-  next: z.string().optional(),
-});
-
-const authSchema = z.object({
-  email: z.string().trim().email("Use a valid email."),
-  password: z.string().min(8, "Use at least 8 characters."),
-  fullName: z.string().trim().min(2, "Enter your full name."),
-});
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: searchSchema,
+  validateSearch: (search: Record<string, unknown>) => ({
+    next: typeof search.next === "string" ? search.next : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign In - Loofah Spa Abuja" },
@@ -51,19 +44,9 @@ function AuthPage() {
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setErrors({});
-
-    const parsed = authSchema.safeParse(form);
-    if (!parsed.success) {
-      const nextErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        if (mode === "signin" && issue.path[0] === "fullName") continue;
-        nextErrors[String(issue.path[0])] = issue.message;
-      }
-      if (mode === "signin") delete nextErrors.fullName;
-      setErrors(nextErrors);
-      if (Object.keys(nextErrors).length > 0) return;
-    }
+    const nextErrors = validateAuthForm(form, mode);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
 
     try {
       setPending(true);
@@ -217,6 +200,26 @@ function AuthPage() {
       </div>
     </section>
   );
+}
+
+function validateAuthForm(
+  form: {
+    fullName: string;
+    email: string;
+    password: string;
+  },
+  mode: "signin" | "signup",
+) {
+  const nextErrors: Record<string, string> = {};
+  const email = form.email.trim();
+  const password = form.password;
+  const fullName = form.fullName.trim();
+
+  if (!EMAIL_PATTERN.test(email)) nextErrors.email = "Use a valid email.";
+  if (password.length < 8) nextErrors.password = "Use at least 8 characters.";
+  if (mode === "signup" && fullName.length < 2) nextErrors.fullName = "Enter your full name.";
+
+  return nextErrors;
 }
 
 function Feature({ text }: { text: string }) {

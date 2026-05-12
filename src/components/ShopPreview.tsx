@@ -30,7 +30,7 @@ export function ShopPreview() {
   if (products.length === 0) return null;
 
   return (
-    <section className="bg-ivory py-28 lg:py-36 px-6 lg:px-12">
+    <section className="bg-ivory px-6 py-24 lg:px-12 lg:py-28">
       <div className="max-w-[1400px] mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
           <Reveal>

@@ -23,13 +23,13 @@ export const Route = createFileRoute("/visit")({
 function VisitPage() {
   return (
     <>
-      <section className="bg-ink text-ivory pt-40 pb-20 px-6 lg:px-12 text-center">
+      <section className="bg-ink px-6 pb-16 pt-32 text-center text-ivory lg:px-12 lg:pb-20 lg:pt-36">
         <span className="font-accent text-[11px] tracking-[0.3em] uppercase text-gold">Find Us</span>
         <h1 className="mt-4 font-display italic text-hero">Step into the sanctuary.</h1>
       </section>
 
       <section className="bg-dark-surface">
-        <div className="max-w-[1400px] mx-auto grid lg:grid-cols-5 min-h-[680px]">
+        <div className="mx-auto grid max-w-[1400px] min-h-[560px] lg:min-h-[620px] lg:grid-cols-5">
           <div className="lg:col-span-2 p-8 lg:p-14 text-ivory">
             <Reveal>
               <h2 className="font-display italic text-4xl text-ivory">Loofah Spa Abuja</h2>

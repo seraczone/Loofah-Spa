@@ -8,8 +8,6 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import type { AppRole, ProfileRecord } from "@/lib/app-data";
-import { fetchProfile, fetchUserRole } from "@/lib/app-store";
-import { hasSupabaseConfig, supabase } from "@/lib/supabase";
 
 interface SignInInput {
   email: string;
@@ -34,7 +32,38 @@ interface AuthContextValue {
   refreshProfile: () => Promise<void>;
 }
 
+type AuthServices = {
+  supabase: NonNullable<(typeof import("@/lib/supabase"))["supabase"]>;
+  fetchProfile: (typeof import("@/lib/app-store"))["fetchProfile"];
+  fetchUserRole: (typeof import("@/lib/app-store"))["fetchUserRole"];
+};
+
+const hasSupabaseConfig = Boolean(
+  import.meta.env.VITE_SUPABASE_URL?.trim() && import.meta.env.VITE_SUPABASE_ANON_KEY?.trim(),
+);
+
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+let authServicesPromise: Promise<AuthServices | null> | null = null;
+
+function loadAuthServices() {
+  if (!hasSupabaseConfig) {
+    return Promise.resolve<AuthServices | null>(null);
+  }
+
+  authServicesPromise ??= Promise.all([import("@/lib/supabase"), import("@/lib/app-store")]).then(
+    ([supabaseModule, storeModule]) => {
+      if (!supabaseModule.supabase) return null;
+      return {
+        supabase: supabaseModule.supabase,
+        fetchProfile: storeModule.fetchProfile,
+        fetchUserRole: storeModule.fetchUserRole,
+      };
+    },
+  );
+
+  return authServicesPromise;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -51,9 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const services = await loadAuthServices();
+    if (!services) {
+      setProfile(null);
+      setRole("client");
+      return;
+    }
+
     const [nextProfile, nextRole] = await Promise.all([
-      fetchProfile(nextSession.user.id),
-      fetchUserRole(nextSession.user.id),
+      services.fetchProfile(nextSession.user.id),
+      services.fetchUserRole(nextSession.user.id),
     ]);
 
     setProfile(nextProfile);
@@ -61,28 +97,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    if (!supabase) {
+    if (!hasSupabaseConfig) {
       setReady(true);
       return;
     }
 
     let alive = true;
+    let unsubscribe: (() => void) | null = null;
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!alive) return;
-      await hydrateUserState(data.session);
-      if (alive) setReady(true);
-    });
+    void loadAuthServices()
+      .then((services) => {
+        if (!alive || !services) {
+          if (alive) setReady(true);
+          return;
+        }
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_, nextSession) => {
-      void hydrateUserState(nextSession).finally(() => {
+        void services.supabase.auth
+          .getSession()
+          .then(async ({ data }) => {
+            if (!alive) return;
+            await hydrateUserState(data.session);
+            if (alive) setReady(true);
+          })
+          .catch(() => {
+            if (alive) setReady(true);
+          });
+
+        const { data: listener } = services.supabase.auth.onAuthStateChange((_, nextSession) => {
+          void hydrateUserState(nextSession).finally(() => {
+            if (alive) setReady(true);
+          });
+        });
+
+        unsubscribe = () => listener.subscription.unsubscribe();
+      })
+      .catch(() => {
         if (alive) setReady(true);
       });
-    });
 
     return () => {
       alive = false;
-      listener.subscription.unsubscribe();
+      unsubscribe?.();
     };
   }, []);
 
@@ -96,16 +151,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role,
       isAdmin: role === "admin",
       async signIn(input) {
-        if (!supabase) throw new Error("Supabase is not configured.");
-        const { error } = await supabase.auth.signInWithPassword({
+        const services = await loadAuthServices();
+        if (!services) throw new Error("Supabase is not configured.");
+        const { error } = await services.supabase.auth.signInWithPassword({
           email: input.email,
           password: input.password,
         });
         if (error) throw error;
       },
       async signUp(input) {
-        if (!supabase) throw new Error("Supabase is not configured.");
-        const { data, error } = await supabase.auth.signUp({
+        const services = await loadAuthServices();
+        if (!services) throw new Error("Supabase is not configured.");
+        const { data, error } = await services.supabase.auth.signUp({
           email: input.email,
           password: input.password,
           options: {
@@ -120,15 +177,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
       },
       async signOut() {
-        if (!supabase) return;
-        const { error } = await supabase.auth.signOut();
+        const services = await loadAuthServices();
+        if (!services) return;
+        const { error } = await services.supabase.auth.signOut();
         if (error) throw error;
       },
       async refreshProfile() {
         if (!session?.user) return;
+        const services = await loadAuthServices();
+        if (!services) return;
         const [nextProfile, nextRole] = await Promise.all([
-          fetchProfile(session.user.id),
-          fetchUserRole(session.user.id),
+          services.fetchProfile(session.user.id),
+          services.fetchUserRole(session.user.id),
         ]);
         setProfile(nextProfile);
         setRole(nextRole?.role ?? "client");

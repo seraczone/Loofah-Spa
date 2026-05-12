@@ -45,7 +45,7 @@ const TIERS = [
 function MembershipPage() {
   return (
     <>
-      <section className="bg-ink text-ivory pt-40 pb-24 px-6 lg:px-12 text-center">
+      <section className="bg-ink px-6 pb-16 pt-32 text-center text-ivory lg:px-12 lg:pb-20 lg:pt-36">
         <span className="font-accent text-[11px] tracking-[0.3em] uppercase text-gold">Loofah Membership</span>
         <h1 className="mt-4 font-display italic text-hero">
           Self-care, <br />
@@ -56,7 +56,7 @@ function MembershipPage() {
         </p>
       </section>
 
-      <section className="bg-cream py-24 lg:py-32 px-6 lg:px-12">
+      <section className="bg-cream px-6 py-20 lg:px-12 lg:py-24">
         <div className="max-w-[1400px] mx-auto grid md:grid-cols-3 gap-6 lg:gap-8">
           {TIERS.map((t, i) => (
             <Reveal key={t.name} delay={i * 120}>
@@ -95,7 +95,7 @@ function MembershipPage() {
         </div>
       </section>
 
-      <section className="bg-ivory py-24 px-6 lg:px-12 text-center">
+      <section className="bg-ivory px-6 py-20 text-center lg:px-12 lg:py-24">
         <Reveal>
           <p className="font-display italic text-2xl lg:text-3xl text-mocha max-w-2xl mx-auto">
             Members receive a personal therapist, sealed records, and the kind of attention reserved for very few.

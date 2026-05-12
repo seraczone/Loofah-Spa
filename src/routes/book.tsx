@@ -2,17 +2,16 @@ import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Calendar, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { BOOKING_SLOTS, buildAppointmentWindow, durationToMinutes, formatSlotLabel } from "@/lib/booking";
 import { fetchBookedSlots, saveBooking } from "@/lib/app-store";
 import { CATEGORIES, SERVICES, formatNGN, type Category } from "@/lib/services";
 import { wa } from "@/lib/site";
 
-const search = z.object({ service: z.string().optional() });
-
 export const Route = createFileRoute("/book")({
-  validateSearch: search,
+  validateSearch: (search: Record<string, unknown>) => ({
+    service: typeof search.service === "string" ? search.service : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Book a Treatment - Loofah Spa Abuja" },

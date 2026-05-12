@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ServiceCard } from "@/components/ServiceCard";
 import { SERVICES, CATEGORIES, type Category } from "@/lib/services";
-import { ServiceCard } from "./index";
 import { Reveal } from "@/components/Reveal";
 
 export const Route = createFileRoute("/services")({
@@ -22,7 +22,7 @@ function ServicesPage() {
 
   return (
     <>
-      <section className="bg-ink text-ivory pt-40 pb-20 px-6 lg:px-12 text-center">
+      <section className="bg-ink px-6 pb-16 pt-32 text-center text-ivory lg:px-12 lg:pb-20 lg:pt-36">
         <span className="font-accent text-[11px] tracking-[0.3em] uppercase text-gold">Treatment Menu</span>
         <h1 className="mt-4 font-display italic text-hero">A ritual for every concern.</h1>
         <p className="mt-6 max-w-2xl mx-auto text-subhead text-ivory/70 font-light">
@@ -30,7 +30,7 @@ function ServicesPage() {
         </p>
       </section>
 
-      <section className="bg-ivory py-16 lg:py-24 px-6 lg:px-12">
+      <section className="bg-ivory px-6 py-14 lg:px-12 lg:py-20">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-wrap gap-2 justify-center mb-14">
             {CATEGORIES.map((c) => (

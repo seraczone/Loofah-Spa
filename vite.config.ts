@@ -36,6 +36,33 @@ export default defineConfig(({ mode }) => {
       },
       dedupe: REACT_DEDUPE,
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("@tanstack")) return "tanstack-vendor";
+            if (id.includes("@supabase")) return "supabase-vendor";
+            if (id.includes("recharts") || id.includes("react-day-picker") || id.includes("date-fns")) {
+              return "admin-vendor";
+            }
+            if (
+              id.includes("@radix-ui") ||
+              id.includes("sonner") ||
+              id.includes("lucide-react") ||
+              id.includes("cmdk") ||
+              id.includes("vaul")
+            ) {
+              return "ui-vendor";
+            }
+            if (id.includes("react-hook-form") || id.includes("@hookform") || id.includes("zod")) {
+              return "forms-vendor";
+            }
+            return "vendor";
+          },
+        },
+      },
+    },
     server: {
       host: "::",
       port: 8080,

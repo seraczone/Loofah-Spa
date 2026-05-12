@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useAuth } from "@/components/providers/AuthProvider";
 import {
   Dialog,
@@ -13,17 +12,6 @@ import { saveLead, upsertProfile } from "@/lib/app-store";
 
 const STORAGE_KEY = "loofah-entry-intake-complete";
 
-const intakeSchema = z.object({
-  fullName: z.string().trim().min(2, "Enter your full name."),
-  whatsapp: z.string().trim().min(7, "Enter a reachable WhatsApp number."),
-  email: z.union([z.string().trim().email("Use a valid email."), z.literal("")]),
-  city: z.string().trim().min(2, "Enter your city."),
-  state: z.string().trim().min(2, "Enter your state."),
-  interest: z.string().trim().min(2, "Tell us what you are interested in."),
-  skinGoals: z.string().trim().max(400, "Keep this under 400 characters."),
-  preferredContact: z.enum(["whatsapp", "phone", "email"]),
-});
-
 const INTEREST_OPTIONS = [
   "Facials & skincare",
   "Laser treatments",
@@ -33,6 +21,8 @@ const INTEREST_OPTIONS = [
   "Shop products",
   "Not sure yet",
 ] as const;
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EntryIntakeGate() {
   const { enabled, ready, user, profile, refreshProfile } = useAuth();
@@ -93,15 +83,9 @@ export function EntryIntakeGate() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    setErrors({});
-
-    const parsed = intakeSchema.safeParse(form);
-    if (!parsed.success) {
-      const nextErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        nextErrors[String(issue.path[0])] = issue.message;
-      }
-      setErrors(nextErrors);
+    const nextErrors = validateIntake(form);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
       return;
     }
 
@@ -113,16 +97,16 @@ export function EntryIntakeGate() {
           user_id: user?.id ?? null,
           lead_type: "visitor_intake",
           source: "entry-modal",
-          name: parsed.data.fullName,
-          email: parsed.data.email || null,
-          whatsapp: parsed.data.whatsapp,
-          message: `${parsed.data.interest} lead from ${parsed.data.city}, ${parsed.data.state}.`,
+          name: form.fullName.trim(),
+          email: form.email.trim() || null,
+          whatsapp: form.whatsapp.trim(),
+          message: `${form.interest.trim()} lead from ${form.city.trim()}, ${form.state.trim()}.`,
           metadata: {
-            interest: parsed.data.interest,
-            city: parsed.data.city,
-            state: parsed.data.state,
-            skin_goals: parsed.data.skinGoals || null,
-            preferred_contact: parsed.data.preferredContact,
+            interest: form.interest.trim(),
+            city: form.city.trim(),
+            state: form.state.trim(),
+            skin_goals: form.skinGoals.trim() || null,
+            preferred_contact: form.preferredContact,
             captured_from: "site-gate",
           },
         },
@@ -131,13 +115,13 @@ export function EntryIntakeGate() {
 
       if (user?.id) {
         await upsertProfile(user.id, {
-          full_name: parsed.data.fullName,
-          email: parsed.data.email || user.email || null,
-          whatsapp: parsed.data.whatsapp,
-          city: parsed.data.city,
-          state: parsed.data.state,
-          preferred_contact: parsed.data.preferredContact,
-          skin_goals: parsed.data.skinGoals || null,
+          full_name: form.fullName.trim(),
+          email: form.email.trim() || user.email || null,
+          whatsapp: form.whatsapp.trim(),
+          city: form.city.trim(),
+          state: form.state.trim(),
+          preferred_contact: form.preferredContact,
+          skin_goals: form.skinGoals.trim() || null,
           visit_intake_completed_at: new Date().toISOString(),
         });
         await refreshProfile();
@@ -160,11 +144,9 @@ export function EntryIntakeGate() {
   if (!enabled || !ready) return null;
 
   return (
-    <Dialog open={open} onOpenChange={() => undefined}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-h-[calc(100vh-1rem)] w-[calc(100vw-1rem)] max-w-[980px] overflow-y-auto rounded-[28px] border border-gold/20 bg-dark-surface p-0 text-ivory shadow-[0_32px_120px_-48px_rgba(0,0,0,0.7)] sm:max-h-[calc(100vh-2rem)] sm:w-[calc(100vw-2rem)] lg:max-h-[min(680px,calc(100vh-2rem))] [&>button]:hidden"
-        onEscapeKeyDown={(event) => event.preventDefault()}
-        onInteractOutside={(event) => event.preventDefault()}
+        className="max-h-[calc(100vh-1rem)] w-[calc(100vw-1rem)] max-w-[940px] overflow-y-auto rounded-[28px] border border-gold/20 bg-dark-surface p-0 text-ivory shadow-[0_32px_120px_-48px_rgba(0,0,0,0.7)] sm:max-h-[calc(100vh-2rem)] sm:w-[calc(100vw-2rem)] lg:max-h-[min(660px,calc(100vh-2rem))] [&>button]:right-4 [&>button]:top-4 [&>button]:flex [&>button]:h-10 [&>button]:w-10 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:border [&>button]:border-gold/20 [&>button]:bg-ink/68 [&>button]:text-gold-light [&>button]:opacity-100 [&>button]:ring-0 [&>button]:ring-offset-0 [&>button]:transition-colors [&>button]:hover:bg-gold [&>button]:hover:text-ink [&>button]:focus-visible:ring-2 [&>button]:focus-visible:ring-gold"
       >
         <div className="grid lg:grid-cols-[0.72fr_1.28fr]">
           <div className="border-b border-gold/12 bg-[radial-gradient(circle_at_top,_rgba(201,169,110,0.18),_transparent_58%),linear-gradient(180deg,rgba(17,14,11,0.94),rgba(17,14,11,0.99))] p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-7">
@@ -326,4 +308,37 @@ function Point({ text }: { text: string }) {
       <span>{text}</span>
     </div>
   );
+}
+
+function validateIntake(form: {
+  fullName: string;
+  whatsapp: string;
+  email: string;
+  city: string;
+  state: string;
+  interest: string;
+  skinGoals: string;
+  preferredContact: "whatsapp" | "phone" | "email";
+}) {
+  const nextErrors: Record<string, string> = {};
+  const fullName = form.fullName.trim();
+  const whatsapp = form.whatsapp.trim();
+  const email = form.email.trim();
+  const city = form.city.trim();
+  const state = form.state.trim();
+  const interest = form.interest.trim();
+  const skinGoals = form.skinGoals.trim();
+
+  if (fullName.length < 2) nextErrors.fullName = "Enter your full name.";
+  if (whatsapp.length < 7) nextErrors.whatsapp = "Enter a reachable WhatsApp number.";
+  if (email && !EMAIL_PATTERN.test(email)) nextErrors.email = "Use a valid email.";
+  if (city.length < 2) nextErrors.city = "Enter your city.";
+  if (state.length < 2) nextErrors.state = "Enter your state.";
+  if (interest.length < 2) nextErrors.interest = "Tell us what you are interested in.";
+  if (skinGoals.length > 400) nextErrors.skinGoals = "Keep this under 400 characters.";
+  if (!["whatsapp", "phone", "email"].includes(form.preferredContact)) {
+    nextErrors.preferredContact = "Choose how you want to be contacted.";
+  }
+
+  return nextErrors;
 }

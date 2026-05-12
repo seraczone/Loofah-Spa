@@ -139,7 +139,7 @@
     font-family: var(--font-body);
     font-weight: 400;
     font-size: 16px;
-    line-height: 1.7;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: "ss01", "cv11";
@@ -167,10 +167,10 @@
   .font-accent { font-family: var(--font-accent); font-weight: 600; letter-spacing: 0.18em; }
   .font-mono { font-family: var(--font-mono); }
 
-  .text-hero { font-size: clamp(52px, 8vw, 112px); line-height: 0.95; letter-spacing: -0.02em; }
-  .text-display { font-size: clamp(36px, 5vw, 72px); line-height: 1.05; letter-spacing: -0.015em; }
-  .text-heading { font-size: clamp(24px, 3vw, 48px); line-height: 1.15; }
-  .text-subhead { font-size: clamp(16px, 2vw, 22px); line-height: 1.5; }
+  .text-hero { font-size: clamp(42px, 6vw, 88px); line-height: 0.98; letter-spacing: -0.02em; }
+  .text-display { font-size: clamp(30px, 4.2vw, 60px); line-height: 1.08; letter-spacing: -0.015em; }
+  .text-heading { font-size: clamp(22px, 2.6vw, 40px); line-height: 1.18; }
+  .text-subhead { font-size: clamp(15px, 1.35vw, 19px); line-height: 1.55; }
   .text-caption { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; }
 
   .gradient-hero-overlay {

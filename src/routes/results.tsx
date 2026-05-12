@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 import { Reveal } from "@/components/Reveal";
-import { BeforeAfterSlider } from "./index";
 import { LuxLink } from "@/components/LuxButton";
 
 export const Route = createFileRoute("/results")({
@@ -51,7 +51,7 @@ function ResultsPage() {
 
   return (
     <>
-      <section className="bg-ink text-ivory pt-40 pb-20 px-6 lg:px-12 text-center">
+      <section className="bg-ink px-6 pb-16 pt-32 text-center text-ivory lg:px-12 lg:pb-20 lg:pt-36">
         <span className="font-accent text-[11px] tracking-[0.3em] uppercase text-gold">Real Results</span>
         <h1 className="mt-4 font-display italic text-hero">
           Transformation, <br />

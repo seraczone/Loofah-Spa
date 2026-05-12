@@ -1,13 +1,19 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HeadContent, Link, Outlet, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
-import { EntryIntakeGate } from "@/components/EntryIntakeGate";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { MobileBar } from "@/components/MobileBar";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { CartProvider } from "@/components/providers/CartProvider";
-import { Toaster } from "@/components/ui/sonner";
 import { SITE } from "@/lib/site";
+
+const LazyToaster = lazy(() =>
+  import("@/components/ui/sonner").then((module) => ({ default: module.Toaster })),
+);
+const LazyEntryIntakeGate = lazy(() =>
+  import("@/components/EntryIntakeGate").then((module) => ({ default: module.EntryIntakeGate })),
+);
 
 function NotFoundComponent() {
   return (
@@ -91,17 +97,35 @@ function RootComponent() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <CartProvider>
-            <EntryIntakeGate />
+            <Suspense fallback={null}>
+              <LazyEntryIntakeGate />
+            </Suspense>
             <Header />
             <main className="min-h-screen">
               <Outlet />
             </main>
             <Footer />
             <MobileBar />
-            <Toaster richColors position="top-right" />
+            <GlobalToaster />
           </CartProvider>
         </AuthProvider>
       </QueryClientProvider>
     </>
+  );
+}
+
+function GlobalToaster() {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
+
+  if (!enabled) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <LazyToaster richColors position="top-right" />
+    </Suspense>
   );
 }

@@ -44,7 +44,7 @@ const CHAPTERS = [
 function AboutPage() {
   return (
     <>
-      <section className="bg-ink text-ivory pt-40 pb-24 px-6 lg:px-12 text-center">
+      <section className="bg-ink px-6 pb-16 pt-32 text-center text-ivory lg:px-12 lg:pb-20 lg:pt-36">
         <span className="font-accent text-[11px] tracking-[0.3em] uppercase text-gold">Our Story</span>
         <h1 className="mt-4 font-display italic text-hero">
           A sanctuary, <br />
@@ -53,7 +53,7 @@ function AboutPage() {
       </section>
 
       {CHAPTERS.map((c, i) => (
-        <section key={c.eyebrow} className={`py-24 lg:py-32 px-6 lg:px-12 ${i % 2 ? "bg-cream" : "bg-ivory"}`}>
+        <section key={c.eyebrow} className={`px-6 py-20 lg:px-12 lg:py-24 ${i % 2 ? "bg-cream" : "bg-ivory"}`}>
           <div className={`max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${i % 2 ? "lg:[&>*:first-child]:order-2" : ""}`}>
             <Reveal>
               <div className="overflow-hidden rounded-3xl">
@@ -70,7 +70,7 @@ function AboutPage() {
         </section>
       ))}
 
-      <section className="bg-dark-surface text-ivory py-24 px-6 lg:px-12 text-center">
+      <section className="bg-dark-surface px-6 py-20 text-center text-ivory lg:px-12 lg:py-24">
         <Reveal>
           <h2 className="font-display italic text-display max-w-3xl mx-auto">
             Visit the sanctuary. <br /> Begin your ritual.
